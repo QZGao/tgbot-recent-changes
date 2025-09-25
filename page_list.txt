@@ -1,13 +1,13 @@
-# Talk pages
+# SuperGrey 的討論頁
 https://zh.wikipedia.org/wiki/User_talk:SuperGrey
 https://en.wikipedia.org/wiki/User_talk:SuperGrey
 https://meta.wikimedia.org/wiki/User_talk:SuperGrey
 
-# Cite Unseen talk pages
+# Cite Unseen 討論頁
 https://meta.wikimedia.org/wiki/Meta_talk:Cite_Unseen
 https://meta.wikimedia.org/wiki/Meta_talk:Cite_Unseen/Suggestions
 
-# Cite Unseen source lists
+# Cite Unseen 來源列表
 https://meta.wikimedia.org/wiki/Meta:Cite Unseen/sources/advocacy/1
 https://meta.wikimedia.org/wiki/Meta:Cite Unseen/sources/advocacy/2
 https://meta.wikimedia.org/wiki/Meta:Cite Unseen/sources/enAMS
