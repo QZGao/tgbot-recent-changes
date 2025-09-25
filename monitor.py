@@ -3,7 +3,7 @@ import html
 import logging
 import os
 import time
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from urllib.parse import urlparse, parse_qs, unquote
 
 import requests
@@ -44,13 +44,6 @@ def read_last_run_iso():
         except Exception:
             logging.warning("Invalid last_run.txt; defaulting to 24h ago.")
             return (datetime.now(timezone.utc) - timedelta(days=1)).isoformat(timespec="seconds").replace("+00:00", "Z")
-
-
-def write_last_run_now():
-    now_iso = datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
-    with open(LAST_RUN_FILE, "w", encoding="utf-8") as f:
-        f.write(now_iso + "\n")
-    logging.info(f"Updated {LAST_RUN_FILE} -> {now_iso}")
 
 
 def parse_page_list(path):
@@ -133,24 +126,34 @@ def chunk(iterable, n):
         yield it[i:i + n]
 
 
-def fetch_revisions_since(session, domain, title, since_iso, now_iso):
+def fetch_revisions_since(session, domain, title, since_iso, now_iso, overlap_seconds=120):
     """
-    For a specific page, fetch revisions newer than since_iso up to now_iso.
-    Uses prop=revisions with rvend=since, rvstart=now (descending=false by default; we set rvdir=newer to get chronological).
-    Returns a list of rev dicts.
+    Fetch page revisions strictly after last run, up to now, in chronological order.
+    Uses rvdir=newer so the list goes oldest -> newest.
+
+    We expand the window slightly backwards by `overlap_seconds` to avoid
+    missing edits that occur exactly at since_iso due to boundary semantics.
     """
     endpoint = api_endpoint_for_domain(domain)
-    # We'll use rvdir=newer so we get chronological order from since -> now
+
+    # Apply a slight overlap to avoid boundary misses
+    try:
+        since_dt = datetime.fromisoformat(since_iso.replace("Z", "+00:00"))
+    except Exception:
+        since_dt = datetime.now(timezone.utc) - timedelta(days=1)
+    since_safe_iso = (since_dt - timedelta(seconds=overlap_seconds)).astimezone(timezone.utc) \
+                        .isoformat(timespec="seconds").replace("+00:00", "Z")
+
     params = {
         "action": "query",
         "format": "json",
         "prop": "revisions",
         "titles": title,
         "redirects": "1",
-        "rvprop": "ids|timestamp|user|comment|size|flags|tags|parsedcomment|sha1|oresscores",
-        "rvdir": "newer",
-        "rvstart": now_iso,
-        "rvend": since_iso,
+        "rvprop": "ids|timestamp|user|comment|size|flags|tags|sha1",
+        "rvdir": "newer",          # chronological
+        "rvstart": since_safe_iso, # EARLIEST bound (start at/after this)
+        "rvend": now_iso,          # LATEST bound (up to this)
         "rvlimit": "50",
     }
 
@@ -182,6 +185,7 @@ def fetch_revisions_since(session, domain, title, since_iso, now_iso):
         else:
             break
 
+    logging.info(f"{domain} {title}: {len(all_revs)} new rev(s) between {since_iso} and {now_iso}")
     return all_revs
 
 
@@ -262,8 +266,8 @@ def send_telegram_message(session, text):
 
 def main():
     last_run_iso = read_last_run_iso()
-    now_iso = datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
-    logging.info(f"Querying changes from {last_run_iso} to {now_iso}")
+    run_start_iso = datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
+    logging.info(f"Querying changes from {last_run_iso} to {run_start_iso}")
 
     groups, order = parse_page_list(PAGE_LIST_FILE)
 
@@ -277,7 +281,7 @@ def main():
         pages = groups.get(group_name, [])
         prepared = []
         for page in pages:
-            revs = fetch_revisions_since(session, page["domain"], page["title"], last_run_iso, now_iso)
+            revs = fetch_revisions_since(session, page["domain"], page["title"], last_run_iso, run_start_iso)
             if revs:
                 any_changes = True
             prepared.append({**page, "revisions": revs})
@@ -294,7 +298,9 @@ def main():
             logging.error(f"Failed to send Telegram message for group '{group_name}'")
 
     if any_changes:
-        write_last_run_now()
+        with open(LAST_RUN_FILE, "w", encoding="utf-8") as f:
+            f.write(run_start_iso + "\n")
+        logging.info(f"Updated {LAST_RUN_FILE} -> {run_start_iso}")
     else:
         logging.info("No new changes; keeping last_run unchanged.")
 
