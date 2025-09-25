@@ -13,10 +13,13 @@ USER_AGENT = "WikimediaDailyWatcher/1.0 (GitHub Actions) contact: N/A"
 LAST_RUN_FILE = "last_run.txt"
 PAGE_LIST_FILE = "page_list.txt"
 TELEGRAM_API = "https://api.telegram.org"
+EXCLUDED_USERS = {'SuperUser'}
+HIDE_BOT_EDITS = True
 
 # Read secrets from env (set these in GitHub Actions Secrets)
 TG_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "")
 TG_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID", "")
+
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
@@ -126,6 +129,41 @@ def chunk(iterable, n):
         yield it[i:i + n]
 
 
+def _is_bot_revision(rev):
+    """Heuristics to identify bot edits.
+    MediaWiki returns 'bot' as a key if rvprop includes flags and the edit has the bot flag.
+    Additionally, some bot edits have 'bot' in tags or username ending with 'bot'."""
+    user = (rev.get("user") or "").lower()
+    if 'bot' in rev:  # flag style
+        return True
+    tags = rev.get("tags", []) or []
+    if any(t.lower() == 'bot' for t in tags):
+        return True
+    if user.endswith('bot'):
+        return True
+    return False
+
+
+def _filter_revisions(revs):
+    if not revs:
+        return revs
+    original = len(revs)
+    filtered = []
+    for r in revs:
+        user = r.get("user") or ""
+        if user in EXCLUDED_USERS:
+            logging.info(f"Excluding revision {r.get('revid')} by excluded user {user}")
+            continue
+        if HIDE_BOT_EDITS and _is_bot_revision(r):
+            logging.info(f"Excluding revision {r.get('revid')} by bot user {user}")
+            continue
+        filtered.append(r)
+    removed = original - len(filtered)
+    if removed:
+        logging.info(f"Filtered out {removed} revision(s) (excluded users/bots)")
+    return filtered
+
+
 def fetch_revisions_since(session, domain, title, since_iso, now_iso, overlap_seconds=120):
     """
     Fetch page revisions strictly after last run, up to now, in chronological order.
@@ -133,6 +171,8 @@ def fetch_revisions_since(session, domain, title, since_iso, now_iso, overlap_se
 
     We expand the window slightly backwards by `overlap_seconds` to avoid
     missing edits that occur exactly at since_iso due to boundary semantics.
+
+    Returns list of revisions after applying exclusion filters.
     """
     endpoint = api_endpoint_for_domain(domain)
 
@@ -159,6 +199,7 @@ def fetch_revisions_since(session, domain, title, since_iso, now_iso, overlap_se
 
     all_revs = []
     tries = 0
+    data = None  # initialize for linter
     while True:
         try:
             r = session.get(endpoint, params=params, timeout=30)
@@ -174,19 +215,21 @@ def fetch_revisions_since(session, domain, title, since_iso, now_iso, overlap_se
             logging.error(f"{domain} {title}: Failed after retries.")
             return []
 
-        pages = data.get("query", {}).get("pages", {})
+        pages = data.get("query", {}).get("pages", {}) if data else {}
         for _, p in pages.items():
             revs = p.get("revisions", [])
             all_revs.extend(revs)
 
-        cont = data.get("continue", {}).get("rvcontinue")
+        cont = data.get("continue", {}).get("rvcontinue") if data else None
         if cont:
             params["rvcontinue"] = cont
         else:
             break
 
-    logging.info(f"{domain} {title}: {len(all_revs)} new rev(s) between {since_iso} and {now_iso}")
-    return all_revs
+    # Apply filtering (excluded users & bot edits)
+    filtered_revs = _filter_revisions(all_revs)
+    logging.info(f"{domain} {title}: {len(filtered_revs)} new rev(s) (raw: {len(all_revs)}) between {since_iso} and {now_iso}")
+    return filtered_revs
 
 
 def build_diff_url(domain, revid, parentid):
@@ -225,6 +268,7 @@ def format_group_message(group_name, grouped_pages):
             diff_url = build_diff_url(domain, revid, parentid)
             safe_user = sanitize_for_telegram_html(user)
             safe_comment = sanitize_for_telegram_html(comment)
+
             # Example line: • 2025-09-25T00:12:34Z — UserName: edit summary (diff)
             parts.append(
                 f"• <code>{ts}</code> — <b>{safe_user}</b>: {safe_comment} (<a href=\"{html.escape(diff_url)}\">diff</a>)")
@@ -269,6 +313,11 @@ def main():
     run_start_iso = datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
     logging.info(f"Querying changes from {last_run_iso} to {run_start_iso}")
 
+    if EXCLUDED_USERS:
+        logging.info(f"Excluding users: {', '.join(sorted(EXCLUDED_USERS))}")
+    if HIDE_BOT_EDITS:
+        logging.info("Bot edits will be hidden.")
+
     groups, order = parse_page_list(PAGE_LIST_FILE)
 
     session = requests.Session()
@@ -306,7 +355,4 @@ def main():
 
 
 if __name__ == "__main__":
-    # Lazy import for timedelta used in fallback
-    from datetime import timedelta
-
     main()
