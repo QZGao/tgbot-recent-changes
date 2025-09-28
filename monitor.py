@@ -9,7 +9,7 @@ from urllib.parse import urlparse, parse_qs, unquote
 import requests
 
 # --- Config ---
-USER_AGENT = "WikimediaDailyWatcher/1.0 (GitHub Actions) contact: N/A"
+USER_AGENT = "WikimediaDailyWatcher/1.0"
 LAST_RUN_FILE = "last_run.txt"
 PAGE_LIST_FILE = "page_list.txt"
 TELEGRAM_API = "https://api.telegram.org"
@@ -19,7 +19,6 @@ HIDE_BOT_EDITS = True
 # Read secrets from env (set these in GitHub Actions Secrets)
 TG_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "")
 TG_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID", "")
-
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
@@ -182,7 +181,7 @@ def fetch_revisions_since(session, domain, title, since_iso, now_iso, overlap_se
     except Exception:
         since_dt = datetime.now(timezone.utc) - timedelta(days=1)
     since_safe_iso = (since_dt - timedelta(seconds=overlap_seconds)).astimezone(timezone.utc) \
-                        .isoformat(timespec="seconds").replace("+00:00", "Z")
+        .isoformat(timespec="seconds").replace("+00:00", "Z")
 
     params = {
         "action": "query",
@@ -191,9 +190,9 @@ def fetch_revisions_since(session, domain, title, since_iso, now_iso, overlap_se
         "titles": title,
         "redirects": "1",
         "rvprop": "ids|timestamp|user|comment|size|flags|tags|sha1",
-        "rvdir": "newer",          # chronological
-        "rvstart": since_safe_iso, # EARLIEST bound (start at/after this)
-        "rvend": now_iso,          # LATEST bound (up to this)
+        "rvdir": "newer",  # chronological
+        "rvstart": since_safe_iso,  # EARLIEST bound (start at/after this)
+        "rvend": now_iso,  # LATEST bound (up to this)
         "rvlimit": "50",
     }
 
@@ -228,7 +227,8 @@ def fetch_revisions_since(session, domain, title, since_iso, now_iso, overlap_se
 
     # Apply filtering (excluded users & bot edits)
     filtered_revs = _filter_revisions(all_revs)
-    logging.info(f"{domain} {title}: {len(filtered_revs)} new rev(s) (raw: {len(all_revs)}) between {since_iso} and {now_iso}")
+    logging.info(
+        f"{domain} {title}: {len(filtered_revs)} new rev(s) (raw: {len(all_revs)}) between {since_iso} and {now_iso}")
     return filtered_revs
 
 
