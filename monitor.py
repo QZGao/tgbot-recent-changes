@@ -13,7 +13,7 @@ USER_AGENT = "WikimediaDailyWatcher/1.0 (GitHub Actions) contact: N/A"
 LAST_RUN_FILE = "last_run.txt"
 PAGE_LIST_FILE = "page_list.txt"
 TELEGRAM_API = "https://api.telegram.org"
-EXCLUDED_USERS = {'SuperUser'}
+EXCLUDED_USERS = {'SuperGrey'}
 HIDE_BOT_EDITS = True
 
 # Read secrets from env (set these in GitHub Actions Secrets)
