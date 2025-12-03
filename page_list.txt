@@ -4,23 +4,25 @@ https://en.wikipedia.org/wiki/User_talk:SuperGrey
 https://meta.wikimedia.org/wiki/User_talk:SuperGrey
 
 # Cite Unseen 討論頁
-https://meta.wikimedia.org/wiki/Meta_talk:Cite_Unseen
-https://meta.wikimedia.org/wiki/Meta_talk:Cite_Unseen/Suggestions
+https://meta.wikimedia.org/wiki/Talk:Cite_Unseen
+https://meta.wikimedia.org/wiki/Talk:Cite_Unseen/Suggestions
 
 # Cite Unseen 來源列表
-https://meta.wikimedia.org/wiki/Meta:Cite Unseen/sources/advocacy/1
-https://meta.wikimedia.org/wiki/Meta:Cite Unseen/sources/advocacy/2
-https://meta.wikimedia.org/wiki/Meta:Cite Unseen/sources/enAMS
-https://meta.wikimedia.org/wiki/Meta:Cite Unseen/sources/enAS
-https://meta.wikimedia.org/wiki/Meta:Cite Unseen/sources/enJAPANS
-https://meta.wikimedia.org/wiki/Meta:Cite Unseen/sources/enKOREAS
-https://meta.wikimedia.org/wiki/Meta:Cite Unseen/sources/enNPPSG/1
-https://meta.wikimedia.org/wiki/Meta:Cite Unseen/sources/enNPPSG/2
-https://meta.wikimedia.org/wiki/Meta:Cite Unseen/sources/enRSP
-https://meta.wikimedia.org/wiki/Meta:Cite Unseen/sources/enVGS
-https://meta.wikimedia.org/wiki/Meta:Cite Unseen/sources/influence
-https://meta.wikimedia.org/wiki/Meta:Cite Unseen/sources/medium
-https://meta.wikimedia.org/wiki/Meta:Cite Unseen/sources/type
-https://meta.wikimedia.org/wiki/Meta:Cite Unseen/sources/zhACGS
-https://meta.wikimedia.org/wiki/Meta:Cite Unseen/sources/zhRSP
-https://meta.wikimedia.org/wiki/Meta:Cite Unseen/sources/zhVGS
+https://meta.wikimedia.org/wiki/Cite_Unseen/sources
+https://meta.wikimedia.org/wiki/Cite_Unseen/sources/advocacy/1
+https://meta.wikimedia.org/wiki/Cite_Unseen/sources/advocacy/2
+https://meta.wikimedia.org/wiki/Cite_Unseen/sources/enAMS
+https://meta.wikimedia.org/wiki/Cite_Unseen/sources/enAS
+https://meta.wikimedia.org/wiki/Cite_Unseen/sources/enFILMR
+https://meta.wikimedia.org/wiki/Cite_Unseen/sources/enJAPANS
+https://meta.wikimedia.org/wiki/Cite_Unseen/sources/enKOREAS
+https://meta.wikimedia.org/wiki/Cite_Unseen/sources/enNPPSG/1
+https://meta.wikimedia.org/wiki/Cite_Unseen/sources/enNPPSG/2
+https://meta.wikimedia.org/wiki/Cite_Unseen/sources/enRSP
+https://meta.wikimedia.org/wiki/Cite_Unseen/sources/enVGS
+https://meta.wikimedia.org/wiki/Cite_Unseen/sources/influence
+https://meta.wikimedia.org/wiki/Cite_Unseen/sources/medium
+https://meta.wikimedia.org/wiki/Cite_Unseen/sources/type
+https://meta.wikimedia.org/wiki/Cite_Unseen/sources/zhACGS
+https://meta.wikimedia.org/wiki/Cite_Unseen/sources/zhRSP
+https://meta.wikimedia.org/wiki/Cite_Unseen/sources/zhVGS
