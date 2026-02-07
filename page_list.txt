@@ -9,10 +9,13 @@ https://meta.wikimedia.org/wiki/Talk:Cite_Unseen/Suggestions
 
 # Cite Unseen 來源列表
 https://meta.wikimedia.org/wiki/Cite_Unseen/sources
+https://meta.wikimedia.org/wiki/Cite_Unseen/sources/advocacy
 https://meta.wikimedia.org/wiki/Cite_Unseen/sources/advocacy/1
 https://meta.wikimedia.org/wiki/Cite_Unseen/sources/advocacy/2
 https://meta.wikimedia.org/wiki/Cite_Unseen/sources/advocacy/3
 https://meta.wikimedia.org/wiki/Cite_Unseen/sources/advocacy/4
+https://meta.wikimedia.org/wiki/Cite_Unseen/sources/aiGenerated
+https://meta.wikimedia.org/wiki/Cite_Unseen/sources/aiReferred
 https://meta.wikimedia.org/wiki/Cite_Unseen/sources/blogs
 https://meta.wikimedia.org/wiki/Cite_Unseen/sources/books
 https://meta.wikimedia.org/wiki/Cite_Unseen/sources/community
@@ -28,9 +31,13 @@ https://meta.wikimedia.org/wiki/Cite_Unseen/sources/enNPPSG/1
 https://meta.wikimedia.org/wiki/Cite_Unseen/sources/enNPPSG/2
 https://meta.wikimedia.org/wiki/Cite_Unseen/sources/enRSP
 https://meta.wikimedia.org/wiki/Cite_Unseen/sources/enVGS
+https://meta.wikimedia.org/wiki/Cite_Unseen/sources/enVSAFES
 https://meta.wikimedia.org/wiki/Cite_Unseen/sources/frJVS
+https://meta.wikimedia.org/wiki/Cite_Unseen/sources/frODS
 https://meta.wikimedia.org/wiki/Cite_Unseen/sources/government
 https://meta.wikimedia.org/wiki/Cite_Unseen/sources/header
+https://meta.wikimedia.org/wiki/Cite_Unseen/sources/influence
+https://meta.wikimedia.org/wiki/Cite_Unseen/sources/medium
 https://meta.wikimedia.org/wiki/Cite_Unseen/sources/news
 https://meta.wikimedia.org/wiki/Cite_Unseen/sources/opinions
 https://meta.wikimedia.org/wiki/Cite_Unseen/sources/predatory
@@ -42,6 +49,9 @@ https://meta.wikimedia.org/wiki/Cite_Unseen/sources/social
 https://meta.wikimedia.org/wiki/Cite_Unseen/sources/sponsored
 https://meta.wikimedia.org/wiki/Cite_Unseen/sources/tabloids
 https://meta.wikimedia.org/wiki/Cite_Unseen/sources/tvPrograms
+https://meta.wikimedia.org/wiki/Cite_Unseen/sources/type
+https://meta.wikimedia.org/wiki/Cite_Unseen/sources/viDSNDTC
 https://meta.wikimedia.org/wiki/Cite_Unseen/sources/zhACGS
 https://meta.wikimedia.org/wiki/Cite_Unseen/sources/zhRSP
 https://meta.wikimedia.org/wiki/Cite_Unseen/sources/zhVGS
+
