@@ -3,6 +3,7 @@ import html
 import logging
 import os
 import time
+import sys
 from datetime import datetime, timezone, timedelta
 from email.utils import parsedate_to_datetime
 from urllib.parse import urlparse, parse_qs, unquote
@@ -390,6 +391,7 @@ def main():
         group_payloads[group_name] = prepared
 
     # Send Telegram messages per group, only if any of its pages had changes
+    failed_sends = False
     for group_name in order:
         pages = group_payloads[group_name]
         if not any(p.get("revisions") for p in pages):
@@ -397,7 +399,13 @@ def main():
         text = format_group_message(group_name, pages)
         ok = send_telegram_message(session, text)
         if not ok:
+            failed_sends = True
             logging.error(f"Failed to send Telegram message for group '{group_name}'")
+
+    if failed_sends:
+        logging.error("One or more Telegram sends failed; aborting without updating last_run.txt")
+        # Exit with non-zero status so the GitHub Action fails
+        sys.exit(1)
 
     if any_changes:
         with open(LAST_RUN_FILE, "w", encoding="utf-8") as f:
