@@ -4,6 +4,7 @@ import logging
 import os
 import time
 from datetime import datetime, timezone, timedelta
+from email.utils import parsedate_to_datetime
 from urllib.parse import urlparse, parse_qs, unquote
 
 import requests
@@ -163,6 +164,32 @@ def _filter_revisions(revs):
     return filtered
 
 
+def _retry_after_seconds(response):
+    """Return server-directed retry delay in seconds, if provided."""
+    if response is None:
+        return None
+
+    retry_after = response.headers.get("Retry-After")
+    if not retry_after:
+        return None
+
+    # Retry-After can be either integer seconds or an HTTP-date.
+    try:
+        secs = int(retry_after)
+        return max(1, secs)
+    except (TypeError, ValueError):
+        pass
+
+    try:
+        retry_dt = parsedate_to_datetime(retry_after)
+        if retry_dt.tzinfo is None:
+            retry_dt = retry_dt.replace(tzinfo=timezone.utc)
+        wait = int((retry_dt - datetime.now(timezone.utc)).total_seconds())
+        return max(1, wait)
+    except Exception:
+        return None
+
+
 def fetch_revisions_since(session, domain, title, since_iso, now_iso, overlap_seconds=120):
     """
     Fetch page revisions strictly after last run, up to now, in chronological order.
@@ -198,15 +225,31 @@ def fetch_revisions_since(session, domain, title, since_iso, now_iso, overlap_se
 
     all_revs = []
     tries = 0
+    max_retries = 5
     data = None  # initialize for linter
     while True:
         try:
             r = session.get(endpoint, params=params, timeout=30)
             r.raise_for_status()
             data = r.json()
+        except requests.exceptions.HTTPError as e:
+            tries += 1
+            status = e.response.status_code if e.response is not None else "?"
+            if tries <= max_retries:
+                retry_after = _retry_after_seconds(e.response)
+                if retry_after is not None:
+                    sleep = retry_after
+                else:
+                    sleep = 2 ** tries
+                logging.warning(
+                    f"{domain} {title}: API HTTP {status} error; retrying in {sleep}s...")
+                time.sleep(sleep)
+                continue
+            logging.error(f"{domain} {title}: Failed after retries (last status: {status}).")
+            return []
         except Exception as e:
             tries += 1
-            if tries <= 3:
+            if tries <= max_retries:
                 sleep = 2 ** tries
                 logging.warning(f"{domain} {title}: API error {e}; retrying in {sleep}s...")
                 time.sleep(sleep)
