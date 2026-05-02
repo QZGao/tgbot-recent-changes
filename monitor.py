@@ -340,11 +340,21 @@ def send_telegram_message(session, text):
                 continue
             r.raise_for_status()
             return True
+        except requests.exceptions.HTTPError as e:
+            tries += 1
+            status = e.response.status_code if e.response is not None else "?"
+            if tries <= 3:
+                sleep = 2 ** tries
+                logging.warning(f"Telegram send HTTP {status}; retry in {sleep}s")
+                time.sleep(sleep)
+                continue
+            logging.error("Telegram send failed after retries.")
+            return False
         except Exception as e:
             tries += 1
             if tries <= 3:
                 sleep = 2 ** tries
-                logging.warning(f"Telegram send error {e}; retry in {sleep}s")
+                logging.warning(f"Telegram send error ({type(e).__name__}); retry in {sleep}s")
                 time.sleep(sleep)
                 continue
             logging.error("Telegram send failed after retries.")
