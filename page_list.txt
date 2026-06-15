@@ -9,6 +9,8 @@ https://meta.wikimedia.org/wiki/Talk:Cite_Unseen/Suggestions
 
 # Cite Unseen 來源列表
 https://meta.wikimedia.org/wiki/Cite_Unseen/sources
+https://meta.wikimedia.org/wiki/Cite_Unseen/sources/academic/institutions
+https://meta.wikimedia.org/wiki/Cite_Unseen/sources/academic/studentPublications
 https://meta.wikimedia.org/wiki/Cite_Unseen/sources/advocacy/1
 https://meta.wikimedia.org/wiki/Cite_Unseen/sources/advocacy/2
 https://meta.wikimedia.org/wiki/Cite_Unseen/sources/advocacy/3
