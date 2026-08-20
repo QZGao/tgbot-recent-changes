@@ -119,6 +119,7 @@ class RevisionFetchTests(unittest.TestCase):
                 "2026-08-20T00:00:00Z",
                 "2026-08-20T01:00:00Z",
                 max_retries=0,
+                request_delay_seconds=0,
             )
 
         self.assertEqual([revision["revid"] for revision in revisions], [2, 3])
@@ -138,6 +139,7 @@ class RevisionFetchTests(unittest.TestCase):
                 "2026-08-20T00:00:00Z",
                 "2026-08-20T01:00:00Z",
                 max_retries=0,
+                request_delay_seconds=0,
             )
 
     def test_http_failure_is_not_treated_as_no_changes(self):
@@ -150,6 +152,7 @@ class RevisionFetchTests(unittest.TestCase):
                 "2026-08-20T00:00:00Z",
                 "2026-08-20T01:00:00Z",
                 max_retries=0,
+                request_delay_seconds=0,
             )
 
     def test_malformed_success_is_not_treated_as_no_changes(self):
@@ -162,7 +165,32 @@ class RevisionFetchTests(unittest.TestCase):
                 "2026-08-20T00:00:00Z",
                 "2026-08-20T01:00:00Z",
                 max_retries=0,
+                request_delay_seconds=0,
             )
+
+    def test_mediawiki_request_is_paced(self):
+        session = FakeSession(get_responses=[
+            FakeResponse({
+                "query": {"pages": {"1": {}}},
+                "continue": {"rvcontinue": "next-page"},
+            }),
+            FakeResponse({"query": {"pages": {"1": {}}}}),
+        ])
+        with mock.patch.object(monitor.time, "sleep") as sleep:
+            monitor.fetch_revisions_since(
+                session,
+                "en.wikipedia.org",
+                "Example",
+                "2026-08-20T00:00:00Z",
+                "2026-08-20T01:00:00Z",
+                max_retries=0,
+            )
+
+        self.assertEqual(sleep.call_count, 2)
+        sleep.assert_has_calls([
+            mock.call(monitor.MEDIAWIKI_REQUEST_DELAY_SECONDS),
+            mock.call(monitor.MEDIAWIKI_REQUEST_DELAY_SECONDS),
+        ])
 
 
 class TelegraphRenderingTests(unittest.TestCase):

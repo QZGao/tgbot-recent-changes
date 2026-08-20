@@ -23,6 +23,7 @@ TELEGRAPH_API = "https://api.telegra.ph"
 EXCLUDED_USERS = {'SuperGrey', 'MediaWiki message delivery'}
 HIDE_BOT_EDITS = True
 REVISION_SETTLE_SECONDS = 120
+MEDIAWIKI_REQUEST_DELAY_SECONDS = 0.1
 TELEGRAPH_CONTENT_LIMIT_BYTES = 64 * 1024
 # Leave room for any server-side representation differences below the documented limit.
 TELEGRAPH_CONTENT_BUDGET_BYTES = 63 * 1024
@@ -224,7 +225,9 @@ def _retry_after_seconds(response):
         return None
 
 
-def fetch_revisions_since(session, domain, title, since_iso, until_iso, max_retries=5):
+def fetch_revisions_since(
+        session, domain, title, since_iso, until_iso, max_retries=5,
+        request_delay_seconds=MEDIAWIKI_REQUEST_DELAY_SECONDS):
     """Fetch revisions in the half-open/closed interval ``(since, until]``.
 
     The caller uses a slightly delayed ``until`` watermark so revisions at the
@@ -263,6 +266,8 @@ def fetch_revisions_since(session, domain, title, since_iso, until_iso, max_retr
         for attempt in range(max_retries + 1):
             try:
                 response = session.get(endpoint, params=params, timeout=30)
+                if request_delay_seconds > 0:
+                    time.sleep(request_delay_seconds)
                 response.raise_for_status()
                 payload = response.json()
                 if not isinstance(payload, dict):

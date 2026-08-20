@@ -8,6 +8,8 @@ to every report article.
 
 - Pages are grouped in `page_list.txt` under `#` headings.
 - Revisions by configured excluded users and detected bots are omitted.
+- MediaWiki requests are sequential and paced by 100 milliseconds, including
+  continuation requests.
 - Each successful run queries through a two-minute safety cutoff, publishes an
   immutable Telegraph report, and advances `last_run.txt` only after Telegram
   delivery. The delayed cutoff prevents overlap duplicates at the watermark.
